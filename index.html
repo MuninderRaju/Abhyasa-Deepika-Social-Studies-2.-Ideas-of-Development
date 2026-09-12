@@ -79,6 +79,21 @@
       color: #1a73e8;
       margin-bottom: 25px;
     }
+    .passage-box {
+      background-color: #eef4fc;
+      border-left: 6px solid #1a73e8;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #2c3e50;
+    }
+    .passage-title {
+      font-weight: bold;
+      color: #1a73e8;
+      margin-bottom: 8px;
+    }
     .question-card {
       background-color: #f8f9fa;
       border-radius: 12px;
@@ -92,6 +107,12 @@
       color: #bb0000;
       margin-bottom: 16px;
       line-height: 1.5;
+    }
+    .sub-text {
+      font-weight: normal;
+      color: #333;
+      margin: 8px 0 12px 0;
+      font-size: 15px;
     }
     .options-list {
       display: flex;
@@ -415,6 +436,57 @@
             "D) 2, 3, 1"
           ]
         }
+      },
+      {
+        id: 12,
+        correctAns: 1, // B) Discrimination
+        isPassageGroup: true,
+        en: {
+          passageTitle: "Read the given text and answer the questions 12 and 13.",
+          passageText: "Besides seeking more income one way or the other people also seek things like equal treatment, freedom, security and respect from others. They resent discrimination. All these are important goals.",
+          q: "12. Besides seeking more income, people resent the following",
+          opts: [
+            "A) Security",
+            "B) Discrimination",
+            "C) Equality",
+            "D) Freedom"
+          ]
+        },
+        te: {
+          passageTitle: "కింది పేరాను చదివి 12 మరియు 13 ప్రశ్నలకు సమాధానాలు రాయండి.",
+          passageText: "ఒకటి లేదా మరొక విధంగా ఎక్కువ ఆదాయాన్ని కోరుకోవడమే కాకుండా, ప్రజలు సమాన నిష్పత్తి/సమానత్వం, స్వేచ్ఛ, భద్రత మరియు ఇతరుల నుండి గౌరవం వంటి వాటిని కూడా కోరుకుంటారు. వారు వివక్షను వ్యతిరేకిస్తారు. ఇవన్నీ ముఖ్యమైన లక్ష్యాలు.",
+          q: "12. ఎక్కువ ఆదాయాన్ని కోరుకోవడమే కాకుండా, ప్రజలు దేనిని అసహ్యించుకుంటారు/వ్యతిరేకిస్తారు?",
+          opts: [
+            "A) భద్రత",
+            "B) వివక్ష (Discrimination)",
+            "C) సమానత్వం",
+            "D) స్వేచ్ఛ"
+          ]
+        }
+      },
+      {
+        id: 13,
+        correctAns: 1, // B) only 2 is correct
+        en: {
+          q: "13. Identify the true statement.",
+          subText: "1. The aim of people life is only to earn income<br>2. Income alone is not enough to live with dignity in the society.",
+          opts: [
+            "A) only 1 is correct",
+            "B) only 2 is correct",
+            "C) 1 and 2 are correct",
+            "D) 1 and 2 are not correct"
+          ]
+        },
+        te: {
+          q: "13. సరైన వాక్యాన్ని గుర్తించండి.",
+          subText: "1. ప్రజల జీవిత ఆశయం కేవలం ఆదాయం సంపాదించడం మాత్రమే.<br>2. సమాజంలో ఆత్మగౌరవంతో జీవించడానికి కేవలం ఆదాయం మాత్రమే సరిపోదు.",
+          opts: [
+            "A) 1 మాత్రమే సరియైనది",
+            "B) 2 మాత్రమే సరియైనది",
+            "C) 1 మరియు 2 సరియైనవి",
+            "D) 1 మరియు 2 సరియైనవి కావు"
+          ]
+        }
       }
     ];
 
@@ -434,9 +506,23 @@
 
       questionsData.forEach((item) => {
         const data = item[currentLanguage];
+
+        // Render Passage Box before Question 12
+        if (item.isPassageGroup) {
+          const passageDiv = document.createElement('div');
+          passageDiv.className = 'passage-box';
+          passageDiv.innerHTML = `
+            <div class="passage-title">${data.passageTitle}</div>
+            <div>${data.passageText}</div>
+          `;
+          quizContainer.appendChild(passageDiv);
+        }
+
         const card = document.createElement('div');
         card.className = 'question-card';
         card.id = `q-card-${item.id}`;
+
+        let subTextHTML = data.subText ? `<div class="sub-text">${data.subText}</div>` : '';
 
         let optionsHTML = data.opts.map((opt, idx) => `
           <label class="option-item" id="opt-label-${item.id}-${idx}">
@@ -447,6 +533,7 @@
 
         card.innerHTML = `
           <div class="question-title">${data.q}</div>
+          ${subTextHTML}
           <div class="options-list">${optionsHTML}</div>
         `;
 
@@ -468,7 +555,7 @@
           label.classList.remove('correct-opt', 'wrong-opt');
         }
 
-        // Highlight correct option by default
+        // Highlight correct option in green
         document.getElementById(`opt-label-${item.id}-${correctIdx}`).classList.add('correct-opt');
 
         if (selectedOption) {
@@ -476,7 +563,7 @@
           if (userAns === correctIdx) {
             score++;
           } else {
-            // Highlight wrong choice selected by student
+            // Highlight user's wrong option in red
             document.getElementById(`opt-label-${item.id}-${userAns}`).classList.add('wrong-opt');
           }
         }
