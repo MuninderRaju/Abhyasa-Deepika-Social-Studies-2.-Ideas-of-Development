@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ideas of Development - Abhyasa Deepika</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .main-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 850px;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .header-title {
+      text-align: center;
+      color: #1a73e8;
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+    }
+    .header-subtitle {
+      text-align: center;
+      color: #1a73e8;
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 20px 0;
+    }
+    .divider {
+      height: 4px;
+      background-color: #1a73e8;
+      border-radius: 2px;
+      margin-bottom: 20px;
+    }
+    .toggle-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .toggle-btn {
+      padding: 8px 24px;
+      border-radius: 20px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid #1a73e8;
+      transition: all 0.2s ease;
+    }
+    .toggle-btn.active {
+      background-color: #1a73e8;
+      color: #ffffff;
+    }
+    .toggle-btn.inactive {
+      background-color: #ffffff;
+      color: #1a73e8;
+    }
+    .score-board {
+      display: none;
+      text-align: center;
+      background-color: #e8f0fe;
+      border: 2px solid #1a73e8;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #1a73e8;
+      margin-bottom: 25px;
+    }
+    .question-card {
+      background-color: #f8f9fa;
+      border-radius: 12px;
+      border-left: 6px solid #1a73e8;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .question-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #bb0000;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      color: #333333;
+      padding: 10px 14px;
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
+      cursor: pointer;
+    }
+    .option-item:hover {
+      background-color: #eef3fc;
+    }
+    .option-item input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #1a73e8;
+      cursor: pointer;
+    }
+    /* Feedback Styles */
+    .option-item.correct-opt {
+      background-color: #d4edda !important;
+      color: #155724;
+      font-weight: bold;
+    }
+    .option-item.wrong-opt {
+      background-color: #f8d7da !important;
+      color: #721c24;
+      font-weight: bold;
+    }
+    .submit-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .submit-btn {
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      padding: 12px 40px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(26, 115, 232, 0.3);
+      transition: background-color 0.2s ease;
+    }
+    .submit-btn:hover {
+      background-color: #1557b0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-card">
+    <h1 class="header-title">Abhyasa Deepika Social Studies</h1>
+    <h2 class="header-subtitle">2. Ideas of Development</h2>
+    <div class="divider"></div>
+
+    <div class="toggle-container">
+      <button class="toggle-btn active" id="btn-en" onclick="setLanguage('en')">English</button>
+      <button class="toggle-btn inactive" id="btn-te" onclick="setLanguage('te')">తెలుగు</button>
+    </div>
+
+    <div id="score-board" class="score-board"></div>
+
+    <form id="quiz-form">
+      <div id="quiz-list"></div>
+      <div class="submit-container">
+        <button type="button" class="submit-btn" id="sub-btn" onclick="calculateScore()">సమర్పించు (Submit)</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const questionsData = [
+      {
+        id: 1,
+        correctAns: 2,
+        en: {
+          q: "1. We can obtain Per Capita Income of a country by calculating",
+          opts: [
+            "A) The total Income of person",
+            "B) Total value of goods and services",
+            "C) By dividing National income with total population",
+            "D) Total exports of the country"
+          ]
+        },
+        te: {
+          q: "1. ఒక దేశపు తలసరి ఆదాయాన్ని ఈ క్రింది విధంగా లెక్కించడం ద్వారా పొందవచ్చు?",
+          opts: [
+            "A) వ్యక్తి యొక్క మొత్తం ఆదాయం",
+            "B) వస్తువులు మరియు సేవల మొత్తం విలువ",
+            "C) జాతీయ ఆదాయాన్ని మొత్తం జనాభాతో భాగించడం ద్వారా",
+            "D) దేశం యొక్క మొత్తం ఎగుమతులు"
+          ]
+        }
+      },
+      {
+        id: 2,
+        correctAns: 0,
+        en: {
+          q: "2. The most common indicator of measuring the Economic development is",
+          opts: [
+            "A) Income",
+            "B) Equal treatment",
+            "C) Security",
+            "D) Freedom"
+          ]
+        },
+        te: {
+          q: "2. ఆర్థిక అభివృద్ధిని కొలవడానికి అత్యంత సాధారణ సూచిక ఏది?",
+          opts: [
+            "A) ఆదాయం",
+            "B) సమాన నిష్పత్తి / సమానత్వం",
+            "C) భద్రత",
+            "D) స్వేచ్ఛ"
+          ]
+        }
+      },
+      {
+        id: 3,
+        correctAns: 0,
+        en: {
+          q: "3. As per the world bank report rich country is referred as country with",
+          opts: [
+            "A) average income of USD 12055 per annum and above",
+            "B) average income of USD 955 per annum and less",
+            "C) average income between USD 956 and USD 12054 per annum and above",
+            "D) average income of Euros of 12055 per annum and more"
+          ]
+        },
+        te: {
+          q: "3. ప్రపంచ బ్యాంకు నివేదిక ప్రకారం ధనిక దేశంగా పరిగణించబడే దేశం యొక్క ఆదాయం ఎంత?",
+          opts: [
+            "A) సంవత్సరానికి సగటు ఆదాయం 12055 US డాలర్లు మరియు అంతకంటే ఎక్కువ",
+            "B) సంవత్సరానికి సగటు ఆదాయం 955 US డాలర్లు మరియు అంతకంటే తక్కువ",
+            "C) సంవత్సరానికి సగటు ఆదాయం 956 నుండి 12054 US డాలర్ల మధ్య ఉండటం",
+            "D) సంవత్సరానికి సగటు ఆదాయం 12055 యూరోలు మరియు అంతకంటే ఎక్కువ"
+          ]
+        }
+      },
+      {
+        id: 4,
+        correctAns: 1,
+        en: {
+          q: "4. Percentage of Literate population of the 7 years and above age group is called",
+          opts: [
+            "A) Knowledge rate",
+            "B) Literacy rate",
+            "C) Mortality Rate",
+            "D) Attendance Rate"
+          ]
+        },
+        te: {
+          q: "4. 7 సంవత్సరాలు మరియు అంతకంటే ఎక్కువ వయస్సు ఉన్న జనాభాలో అక్షరాస్యుల శాతాన్ని ఏమంటారు?",
+          opts: [
+            "A) జ్ఞాన రేటు",
+            "B) అక్షరాస్యత రేటు",
+            "C) మరణాల రేటు",
+            "D) హాజరు రేటు"
+          ]
+        }
+      },
+      {
+        id: 5,
+        correctAns: 2,
+        en: {
+          q: "5. This is NOT one of the dimensions to the Human Development Index?",
+          opts: [
+            "A) Health",
+            "B) Education",
+            "C) Political freedom",
+            "D) Life expectancy"
+          ]
+        },
+        te: {
+          q: "5. మానవాభివృద్ధి సూచిక (HDI) లో లేని అంశం ఏది?",
+          opts: [
+            "A) ఆరోగ్యం",
+            "B) విద్య",
+            "C) రాజకీయ స్వేచ్ఛ",
+            "D) జీవిత కాల పరిమితి"
+          ]
+        }
+      },
+      {
+        id: 6,
+        correctAns: 2,
+        en: {
+          q: "6. Public distribution system is meant for:",
+          opts: [
+            "A) Providing education",
+            "B) Providing medical aid",
+            "C) Providing essential commodities",
+            "D) Providing transport facilities"
+          ]
+        },
+        te: {
+          q: "6. ప్రజా పంపిణీ వ్యవస్థ (PDS) యొక్క ముఖ్య ఉద్దేశ్యం ఏమిటి?",
+          opts: [
+            "A) విద్యను అందించడం",
+            "B) వైద్య సహాయం అందించడం",
+            "C) నిత్యావసర వస్తువులను అందించడం",
+            "D) రవాణా సదుపాయాలను అందించడం"
+          ]
+        }
+      },
+      {
+        id: 7,
+        correctAns: 0,
+        en: {
+          q: "7. The number of children who die within one year out of 1000 is referred as",
+          opts: [
+            "A) Infant Mortality rate",
+            "B) Maternal mortality rate",
+            "C) Death rate",
+            "D) Life expectancy"
+          ]
+        },
+        te: {
+          q: "7. సజీవంగా జన్మించిన ప్రతి 1000 మంది పిల్లలలో ఒక సంవత్సరం వయస్సు పూర్తికాకుండానే మరణించే పిల్లల సంఖ్యను ఏమంటారు?",
+          opts: [
+            "A) శిశు మరణాల రేటు (Infant Mortality rate)",
+            "B) మాతృ మరణాల రేటు",
+            "C) మరణాల రేటు",
+            "D) ఆయుఃప్రమాణం"
+          ]
+        }
+      },
+      {
+        id: 8,
+        correctAns: 2,
+        en: {
+          q: "8. Human Development Index does not include",
+          opts: [
+            "A) Social indicators",
+            "B) Health care",
+            "C) Sex ratio",
+            "D) Education"
+          ]
+        },
+        te: {
+          q: "8. మానవాభివృద్ధి సూచిక (HDI) లో చేర్చబడని అంశం ఏది?",
+          opts: [
+            "A) సామాజిక సూచికలు",
+            "B) ఆరోగ్య సంరక్షణ",
+            "C) స్త్రీ పురుష నిష్పత్తి (Sex ratio)",
+            "D) విద్య"
+          ]
+        }
+      },
+      {
+        id: 9,
+        correctAns: 0,
+        en: {
+          q: "9. The development goals of landless rural labourers are",
+          opts: [
+            "A) More days of work and better wages",
+            "B) More irrigation facilities by the government",
+            "C) They should get better jobs",
+            "D) Accident free work environment"
+          ]
+        },
+        te: {
+          q: "9. భూమి లేని గ్రామీణ కూలీల అభివృద్ధి లక్ష్యాలు ఏమిటి?",
+          opts: [
+            "A) ఎక్కువ రోజుల పని మరియు మెరుగైన కూలి",
+            "B) ప్రభుత్వం నుండి ఎక్కువ నీటిపారుదల సౌకర్యాలు",
+            "C) వారు మంచి ఉద్యోగాలు పొందాలి",
+            "D) ప్రమాదాలు లేని పని వాతావరణం"
+          ]
+        }
+      },
+      {
+        id: 10,
+        correctAns: 1,
+        en: {
+          q: "10. Total income is not useful for comparison between the countries because",
+          opts: [
+            "A) They are not located in one continent",
+            "B) They have different population",
+            "C) Their geographical features are different",
+            "D) Their currency is different"
+          ]
+        },
+        te: {
+          q: "10. దేశాల మధ్య పోలిక కోసం మొత్తం ఆదాయం ఉపయోగపడదు, ఎందుకంటే?",
+          opts: [
+            "A) అవి ఒకే ఖండంలో లేవు",
+            "B) ఆ దేశాలు వేర్వేరు జనాభాను కలిగి ఉంటాయి",
+            "C) వాటి భౌగోళిక లక్షణాలు భిన్నంగా ఉంటాయి",
+            "D) వాటి కరెన్సీ వేర్వేరుగా ఉంటుంది"
+          ]
+        }
+      },
+      {
+        id: 11,
+        correctAns: 3,
+        en: {
+          q: "11. The order of stages in the development of human history (1. Industrialisation, 2. Hunting and gathering, 3. Agriculture)",
+          opts: [
+            "A) 1, 2, 3",
+            "B) 2, 1, 3",
+            "C) 3, 2, 1",
+            "D) 2, 3, 1"
+          ]
+        },
+        te: {
+          q: "11. మానవ చరిత్ర అభివృద్ధిలోని దశల క్రమం (1. పారిశ్రామికీకరణ, 2. వేటాడటం - సేకరించడం, 3. వ్యవసాయం)",
+          opts: [
+            "A) 1, 2, 3",
+            "B) 2, 1, 3",
+            "C) 3, 2, 1",
+            "D) 2, 3, 1"
+          ]
+        }
+      }
+    ];
+
+    let currentLanguage = 'te';
+
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      document.getElementById('btn-en').className = lang === 'en' ? 'toggle-btn active' : 'toggle-btn inactive';
+      document.getElementById('btn-te').className = lang === 'te' ? 'toggle-btn active' : 'toggle-btn inactive';
+      document.getElementById('sub-btn').innerText = lang === 'en' ? 'Submit Answers' : 'సమర్పించు (Submit)';
+      renderQuestions();
+    }
+
+    function renderQuestions() {
+      const quizContainer = document.getElementById('quiz-list');
+      quizContainer.innerHTML = '';
+
+      questionsData.forEach((item) => {
+        const data = item[currentLanguage];
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `q-card-${item.id}`;
+
+        let optionsHTML = data.opts.map((opt, idx) => `
+          <label class="option-item" id="opt-label-${item.id}-${idx}">
+            <input type="radio" name="q_${item.id}" value="${idx}">
+            <span>${opt}</span>
+          </label>
+        `).join('');
+
+        card.innerHTML = `
+          <div class="question-title">${data.q}</div>
+          <div class="options-list">${optionsHTML}</div>
+        `;
+
+        quizContainer.appendChild(card);
+      });
+    }
+
+    function calculateScore() {
+      let score = 0;
+      const total = questionsData.length;
+
+      questionsData.forEach((item) => {
+        const selectedOption = document.querySelector(`input[name="q_${item.id}"]:checked`);
+        const correctIdx = item.correctAns;
+
+        // Reset previous styling
+        for (let i = 0; i < item[currentLanguage].opts.length; i++) {
+          const label = document.getElementById(`opt-label-${item.id}-${i}`);
+          label.classList.remove('correct-opt', 'wrong-opt');
+        }
+
+        // Highlight correct option by default
+        document.getElementById(`opt-label-${item.id}-${correctIdx}`).classList.add('correct-opt');
+
+        if (selectedOption) {
+          const userAns = parseInt(selectedOption.value);
+          if (userAns === correctIdx) {
+            score++;
+          } else {
+            // Highlight wrong choice selected by student
+            document.getElementById(`opt-label-${item.id}-${userAns}`).classList.add('wrong-opt');
+          }
+        }
+      });
+
+      // Show Score
+      const scoreBoard = document.getElementById('score-board');
+      scoreBoard.style.display = 'block';
+      scoreBoard.innerHTML = currentLanguage === 'en' 
+        ? `🎯 Your Score: ${score} / ${total}` 
+        : `🎯 మీ స్కోరు: ${score} / ${total}`;
+      
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Default load Telugu language
+    setLanguage('te');
+  </script>
+</body>
+</html>
